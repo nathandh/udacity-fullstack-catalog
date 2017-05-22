@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %} Item Catalog App | Udacity {% endblock %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--[if lt IE 9]>
+		<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries/js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="/css/catalog.css" />
+</head>
+
+<body>
+	<div id="top" class="top">
+		<h2>Catalog App</h2>
+	</div>
+	<div id="content" class="content">
+		{% block content %}
+		{% endblock %}
+	</div>
+</body>
+</html>
+
+
