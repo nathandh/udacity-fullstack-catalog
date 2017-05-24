@@ -6,12 +6,29 @@
 	<!--[if lt IE 9]>
 		<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries/js"></script>
 	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="/css/catalog.css" />
+	<link type="text/css" rel="stylesheet" href={{ url_for('static', 
+										     filename="css/catalog.css") }} />
 </head>
 
 <body>
 	<div id="top" class="top">
-		<h2>Catalog App</h2>
+		<div class="app-title">
+			<h2><a href="/catalog/">Catalog App</a></h2>
+		</div>
+		<div class="login-link">
+			<a href="#" class="login-btn">Login</a>
+		</div>
+	</div>
+	<div id="messages" class="messages">
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul class="flashes">
+				{% for message in messages %}
+					<li>{{message}}</li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
 	</div>
 	<div id="content" class="content">
 		{% block content %}
@@ -19,5 +36,3 @@
 	</div>
 </body>
 </html>
-
-

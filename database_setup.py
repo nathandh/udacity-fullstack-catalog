@@ -1,7 +1,7 @@
 import sys, datetime
 
-from sqlalchemy import (Column, ForeignKey, Integer, String,
-                        Text, DateTime, Enum, create_engine)
+from sqlalchemy import (Column, ForeignKey, Integer, String, Text, 
+                        DateTime, Enum, UniqueConstraint, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -19,7 +19,7 @@ class LoginType(Base):
 class Category(Base):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
-    name = Column(String(80), nullable=False)
+    name = Column(String(80), nullable=False, unique=True)
     description = Column(Text, nullable=False)
     
     created_by = Column(String, ForeignKey('user.email')) 
@@ -31,6 +31,10 @@ class Category(Base):
 
 class Item(Base):
     __tablename__ = 'item'
+    # explicit/composite unique constraint
+    __table_args__ = (
+        UniqueConstraint('category_id', 'name', name='categ_itemname'),
+    )
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     description = Column(Text, nullable=False)

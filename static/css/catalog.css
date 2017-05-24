@@ -1,0 +1,89 @@
+body {
+	margin: 0px;
+	background: #C0C0C0;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+/* Top Header */
+.top {
+	background: darkblue;
+}
+.top div {
+	display: inline-flex;
+}
+.top > .app-title h2 {
+	-webkit-margin-before: 0px;
+	margin: auto;
+	padding: 8px;
+	width: 60%;
+	color: #FFFFFF;
+}
+.top > .app-title {
+	width: 60%;
+	margin: auto;
+}
+.top > .app-title a {
+	text-decoration: none;
+	color: #FFFFFF;
+}
+.top > .login-link {
+	width: 39%;
+	margin-top: 8px;
+	margin-bottom: 0px;
+}
+.login-btn {
+	padding: 8px;
+	background: darkorange;
+	color: white;
+	margin-left: auto;
+	margin-right: 16%;
+	text-decoration: none;
+}
+.content {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 16px;
+	width: 75%;
+	padding: 8px;
+	background: #FFFFFF;
+}
+/* Main HOME catalog content */
+.catalog-main {
+	display: inline-flex;
+}
+.left-content, .right-content {
+	display: inline-block;
+}
+.left-content {
+	padding-right: 2em;
+}
+.right-content {
+	padding-left: 2em;
+	border-left: 1px solid #C0C0C0;
+}
+.category, .item {
+	color: darkorange;
+}
+/* Item Category on '/' HOME, INFO, and DELETE pages */
+.item-categ, .item-info-categ, .item-del-categ {
+	font-style: italic;
+	color: #C0C0C0;
+}
+/* ITEM forms */
+.new-item-form form, .edit-item-form form {
+	display: inline-grid;
+}
+.new-item-form input, textarea, select {
+	display: block;
+	margin-bottom: 8px;
+}
+.edit-item-form input, textarea, select {
+	display: block;
+	margin-bottom: 8px;
+}
+.new-item-form textarea, .edit-item-form textarea {
+	height: 8em;
+	width: 16em;
+}
+.new-item-form button, .edit-item-form button {
+	width: 80px;
+}

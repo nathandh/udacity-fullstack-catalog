@@ -5,16 +5,60 @@
 {% endblock %}
 
 {% block content %}
-	{% if categories|count > 0 %}
-		{% for category in categories %}
-			<div class="category">
-				{{category.name}}
-				<a href="#">Edit</a> |
-				<a href="#">Delete</a><br/>
-				<br/>
-			</div>
-		{% endfor %}
-	{% else %}
-		<p>No Categories</p>
-	{% endif %}
+	<div class="catalog-main">
+		{% block left_content %}
+		<div class="left-content">
+			{% if is_admin == True %}
+				<a href="/catalog/category/new/">Add Category</a>
+			{% endif %}
+			<h3>Categories</h3>
+			{% if categories|count > 0 %}
+				{% for category in categories %}
+					<div class="category">
+						<a href="/catalog/{{category.name}}/items/">
+							{{category.name}}
+						</a><br/> 
+						{% if is_admin == True %}
+							<div class="category-admin">
+								*Admin:<br/>
+								<a href="/catalog/{{category.name}}/">
+									Info</a> | 
+								<a href="#">Edit</a> |
+								<a href="#">Delete</a><br/>
+								<hr>
+							</div>
+						{% endif %}
+						<br/>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p>No Categories</p>
+			{% endif %}
+			<hr>
+			<a href="/catalog/">Home</a><br/>
+		</div>
+		{% endblock %}
+		{% block right_content %}
+		<div class="right-content">
+			{% if is_admin == True %}
+				<a href="/catalog/item/new/">Add Item</a>
+			{% endif %}
+			<h3>Latest Items</h3>
+			{% if latest_items|count > 0 %}
+				{% for item in latest_items %}
+					<div class="item">
+						<a href="/catalog/{{item.category.name}}/{{item.name}}/">
+							{{item.name}}
+						</a>
+						<span class="item-categ">
+							({{item.category.name}})
+						</span>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p>No Latest Items</p>
+			{% endif %}
+		</div>
+		{% endblock %}
+	</div>
 {% endblock %}

@@ -1,0 +1,25 @@
+{% extends "catalog.html" %}
+
+{% block title %}
+	{{curr_categ.name}} Items | Category Item App
+{% endblock %}
+
+{% block right_content %}
+	<div class="right-content">
+		<h3>{{curr_categ.name}} Items ({{categ_items|count}} items)</h3>
+		{% if categ_items|count > 0 %}
+			{% for item in categ_items %}
+				<div class="item">
+					<a href="/catalog/{{item.category.name}}/{{item.name}}/">
+						{{item.name}}
+					</a>
+					<span class="item-categ">
+						({{item.category.name}})
+					</span>
+				</div>
+			{% endfor %}
+		{% else %}
+			<p>No Items for: {{curr_categ.name}}</p>
+		{% endif %}
+	</div>
+{% endblock %}
