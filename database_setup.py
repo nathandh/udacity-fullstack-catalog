@@ -71,7 +71,7 @@ class User(Base):
 class Role(Base):
     __tablename__ = 'role'
     id = Column(Integer, primary_key=True)
-    permission = Column(String(40), nullable=False)
+    permission = Column(String(40), nullable=False, unique=True)
 
     users = relationship("User", secondary='user_role_association',
                          order_by="User.id")

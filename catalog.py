@@ -67,6 +67,111 @@ def categoryInfo(category):
 
     return render_template("category.html", curr_categ=curr_categ)
 
+@app.route('/catalog/category/new/', methods=['GET', 'POST'])
+def newCategory():
+    print "In newCategory()"
+    user = getUser()
+    is_admin = checkAdmin(user)
+
+    if request.method == 'POST':
+        print "In Post"
+
+        # Grab our values
+        name = request.form['name']
+        desc = request.form['desc']
+
+        if name != "" and desc != "":
+            try:
+                # Create our Category
+                new_categ = Category(name=name, description=desc,
+                            created_by=user.email, last_update_by=user.email)
+
+                session.add(new_categ)
+                session.commit()
+
+                flash("Catalog CATEGORY added successfully!")
+            except exc.IntegrityError as e:
+                session.rollback()
+                flash("""Cannot Add, Category with chosen NAME 
+                      already exists...""")
+            finally:
+                return redirect(url_for('catalogHome'))
+    else:
+        print "Get called"
+        return render_template("new-category.html")
+
+@app.route('/catalog/<category>/edit/', methods=['GET', 'POST'])
+def editCategory(category):
+    print "In editCategory()"
+    user = getUser()
+    is_admin = checkAdmin(user)
+
+    curr_categ = session.query(
+                        Category).filter(Category.name==str(category)).one()
+
+    if request.method == 'POST':
+        print "In Post"
+
+        # Grab our values
+        name = request.form['name']
+        desc = request.form['desc']
+        categ = request.form['category']
+
+        # Lookup actual category object for verification of submit
+        category = session.query(Category).filter(
+                                            Category.name==str(categ)).one()
+
+        if category and (category == curr_categ):
+            # Edit our existing Category
+            try:
+                curr_categ.name = name
+                curr_categ.description = desc
+                curr_categ.last_update_by = user.email
+
+                session.commit()
+
+                msg = "Edited category %s successfully!" % curr_categ.name
+                flash(msg)
+            except exc.IntegrityError as e:
+                session.rollback()
+                flash("Cannot Edit: Category Name already exists...")
+            finally:
+                return redirect(url_for('catalogHome'))
+    else:
+        print "Get request called"
+        return render_template("edit-category.html", category=curr_categ)
+
+@app.route('/catalog/<category>/delete/', methods=['GET', 'POST'])
+def deleteCategory(category):
+    print "In deleteCategory()"
+    user = getUser()
+    is_admin = checkAdmin(user)
+
+    curr_categ = session.query(
+                        Category).filter(Category.name==str(category)).one()
+
+    if request.method == 'POST':
+        print "In Post"
+
+        # Grab our hidden form values
+        frm_name = request.form['name']
+
+        if (curr_categ.name == frm_name):
+
+            # We should be good to DELETE our category
+            for item in curr_categ.items:
+                session.delete(item)
+                
+            session.delete(curr_categ)
+            session.commit()
+
+            msg = "Deleted %s successfully!" % curr_categ.name
+            flash(msg)
+            return redirect(url_for('catalogHome'))
+    else:
+        print "Get request called"
+        return render_template("delete-category.html", category=curr_categ)
+
 
 """
 Item Specific

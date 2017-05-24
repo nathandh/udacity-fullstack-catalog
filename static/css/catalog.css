@@ -63,6 +63,26 @@ body {
 .category, .item {
 	color: darkorange;
 }
+/* Category CRUD Forms */
+.new-category-form form, .edit-category-form form {
+	display: inline-grid;
+}
+.new-category-form input, textarea {
+	display: block;
+	margin-bottom: 8px;
+}
+.edit-category-form input, textarea {
+	display: block;
+	margin-bottom: 8px;
+}
+.new-category-form textarea, .edit-category-form textarea {
+	height: 8em;
+	width: 16em;
+}
+.new-category-form button, .edit-category-form button {
+	width: 120px;
+}
+
 /* Item Category on '/' HOME, INFO, and DELETE pages */
 .item-categ, .item-info-categ, .item-del-categ {
 	font-style: italic;

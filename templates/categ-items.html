@@ -6,7 +6,11 @@
 
 {% block right_content %}
 	<div class="right-content">
-		<h3>{{curr_categ.name}} Items ({{categ_items|count}} items)</h3>
+		{% if is_admin == True %}
+			<a href="/catalog/item/new/">Add Item</a>
+		{% endif %}
+		<h3>{{curr_categ.name}} Items</h3>
+		<h4>({{categ_items|count}} items)</h4>
 		{% if categ_items|count > 0 %}
 			{% for item in categ_items %}
 				<div class="item">

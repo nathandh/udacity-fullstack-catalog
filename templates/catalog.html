@@ -17,14 +17,12 @@
 					<div class="category">
 						<a href="/catalog/{{category.name}}/items/">
 							{{category.name}}
-						</a><br/> 
+						</a><br/><br/> 
 						{% if is_admin == True %}
 							<div class="category-admin">
 								*Admin:<br/>
-								<a href="/catalog/{{category.name}}/">
-									Info</a> | 
-								<a href="#">Edit</a> |
-								<a href="#">Delete</a><br/>
+								| <a href="/catalog/{{category.name}}/">
+									Manage {{category.name}}</a> | <br/>
 								<hr>
 							</div>
 						{% endif %}
