@@ -6,13 +6,22 @@ Item Catalog Application:
     - ver: 0.1  05/2017
 """
 
-from flask import (Flask, render_template, request, redirect, flash, url_for)
+import os, hashlib, httplib2, requests, json
+
+from flask import (Flask, render_template, request, redirect, flash, 
+                   url_for, make_response, session as login_session)
 
 app = Flask(__name__)
 
 from sqlalchemy import create_engine, desc, exc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
+
+# OAuth2 related imports
+from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+
+CLIENT_ID = json.loads(
+                   open('client_secrets.json', 'r').read())['web']['client_id']
 
 engine = create_engine('sqlite:///itemcatalog.db')
 Base.metadata.bind = engine
@@ -23,17 +32,24 @@ session = DBSession()
 # Helper functions
 
 def getUser():
-    user = session.query(User).filter(
-                                User.email=='nathandhernandez@gmail.com').one()
-
-    return user
+    user = ""
+    try:
+        email = login_session['email']
+        user = session.query(User).filter(
+                            User.email==email).one()
+    except LookupError:
+        user = None
+        print "User doesn't exist, or error retrieving, from our database."
+    finally:
+        return user
 
 def checkAdmin(user):
     is_admin = False
-    for role in user.roles:
-        if role.permission == "admin":
-            is_admin = True
-            break
+    if user is not None:
+        for role in user.roles:
+            if role.permission == "admin":
+                is_admin = True
+                break
 
     return is_admin
 
@@ -331,6 +347,170 @@ def getUsers():
 
     return render_template("users.html", users=users)
 
+"""
+Login Specific
+"""
+
+@app.route('/login/')
+def showLogin():
+    state = hashlib.sha256(os.urandom(1024)).hexdigest() 
+    login_session['state'] = state
+    return render_template("login.html", STATE=state)
+    # return "The current login session state is %s" % login_session['state']
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    if request.args.get('state') != login_session['state']:
+        print "request args: %s" % request.args.get('state')
+        print "login_session: %s" % login_session['state']
+        response = make_response(json.dumps('Invalid state parameter'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        code = request.data
+        try:
+            # Upgrade auth code into credentials object
+            oauth_flow = flow_from_clientsecrets('client_secrets.json',
+                                                 scope='')
+            oauth_flow.redirect_uri = 'postmessage'
+            credentials = oauth_flow.step2_exchange(code)
+        except FlowExchangeError:
+            response = make_response(json.dumps("""Failed to upgrade the 
+                                     authorization code."""), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # Check that access token is valid
+        access_token = credentials.access_token
+        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+                % access_token)
+        h = httplib2.Http()
+        result = json.loads(h.request(url, 'GET')[1])
+
+        # Check result for errors
+        if result.get('error') is not None:
+            response = make_response(json.dumps(result.get('error')), 500)
+            response.headers['Content-Type'] = 'application/json'        
+            return response
+
+        # Verify access token is for intended user
+        gplus_id = credentials.id_token['sub']
+        if result['user_id'] != gplus_id:
+            response = make_response(json.dumps("""Token's user ID doesn't 
+                                    match given user ID."""), 401)
+            response.header['Content-Type'] = 'application/json'
+            return response
+
+        # Verify access token is valid for this app
+        if result['issued_to'] != CLIENT_ID:
+            response = make_response(json.dumps("""Token's client ID doesn't 
+                                     match the app."""), 401)
+            print "Token's client ID does not match the app's."
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # Check if user is already LOGGED IN
+        stored_credentials = login_session.get('credentials')
+        stored_gplus_id = login_session.get('gplus_id')
+        if stored_credentials is not None and gplus_id == stored_gplus_id:
+            response = make_response(json.dumps("""Current user is already 
+                                     connected."""), 200)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # Store access token in session for later use
+        login_session['credentials'] = credentials.access_token
+        login_session['gplus_id'] = gplus_id
+
+        # Get Google User info
+        userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+        params = {'access_token': credentials.access_token, 'alt': 'json'}
+        answer = requests.get(userinfo_url, params=params)
+
+        data = answer.json()
+
+        login_session['username'] = data['name']
+        login_session['picture'] = data['picture']
+        login_session['email'] = data['email']
+
+        # See if user is already in our database
+        user = getUser()
+        if user is None:
+            # Set Google login type
+            logintype = session.query(LoginType).filter(source=="google").one()
+
+            # 1st time User, grab default 'contrib' Role
+            c_role = session.query(Role).filter(permission=="contrib").one()
+            # Admin role
+            a_role = session.query(Role).filter(permission=="admin").one()
+            # UNCOMMENT to apply Admin and Contrib roles
+            # new_user_roles = [c_role, a_role]
+            # COMMENT next line if you uncomment preceding line
+            new_user_roles = [c_role]
+            # Store our User info to recall later
+            new_user = User(name=data['name'], picture=data['picture'],
+                            email=data['email'],roles=new_user_roles,
+                            logintype_id=logintype.id)
+            
+            session.add(new_user)
+            session.commit()
+        elif user.email == data['email']:
+            # Just update our stored data in case something changed:
+            user.name = data['name']
+            user.picture = data['picture']
+            session.commit()
+            
+        output = ""
+        output += "<h1>Welcome, "
+        output += login_session['username']
+        output += "!</h1>"
+        output += "<img src='"
+        output += login_session['picture']
+        output += """ ' style='width: 300px; height: 300px; 
+                  border-radius: 150px; -webkit-border-radius: 150px; 
+                  -moz-border-radius: 150px;'> """
+        flash("You are now logged in as %s" % login_session['username'])
+        print "Done with Google Login!"
+        return output
+
+@app.route("/logout/")
+@app.route("/gdisconnect/")
+def gdisconnect():
+    # Disconnect a logged in / connected user
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(json.dumps("Current user not connected."),
+                                 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # Execute GET to revoke current token
+        access_token = credentials
+        url = ("https://accounts.google.com/o/oauth2/revoke?token=%s" % 
+               access_token)
+        h = httplib2.Http()
+        result = h.request(url, 'GET')[0]
+
+        if result['status'] == '200':
+            # Reset the user's session
+            del login_session['credentials']
+            del login_session['gplus_id']
+            del login_session['username']
+            del login_session['picture']
+            del login_session['email']
+              
+            response = make_response(json.dumps("Successfully disconnected."),
+                                    200)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        else:
+            # Other than 200 response
+            response = make_response(json.dumps(
+                                 "Failed to revoke token for the given user."), 
+                                 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+            
 if __name__ == '__main__':
     app.secret_key = "secret"
     app.template_folder = 'templates'

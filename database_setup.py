@@ -14,7 +14,8 @@ class LoginType(Base):
     # Can expand this enum type later (e.g. Facebook, LinkedIn, etc...)
     __tablename__ = 'logintype'
     id = Column(Integer, primary_key=True)
-    source = Column(String(40), nullable=False)
+    source = Column(String(40), nullable=False, unique=True)
+    created = Column(DateTime(timezone=True), server_default=func.now())
 
 class Category(Base):
     __tablename__ = 'category'
@@ -58,7 +59,13 @@ user_role_association = Table('user_role_association', Base.metadata,
                               
 class User(Base):
     __tablename__ = 'user'
+    # explicit/composite unique constraint
+    __table_args__ = (
+        UniqueConstraint('email', 'logintype_id', name='email_logintype'),
+    )
     id = Column(Integer, primary_key=True)
+    name = Column(String(128))
+    picture = Column(String(256))
     email = Column(String(256), nullable=False)
     created = Column(DateTime(timezone=True), server_default=func.now())
     

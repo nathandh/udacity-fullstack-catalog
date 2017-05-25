@@ -25,12 +25,12 @@ body {
 	text-decoration: none;
 	color: #FFFFFF;
 }
-.top > .login-link {
+.top > .login-logout-link {
 	width: 39%;
 	margin-top: 8px;
 	margin-bottom: 0px;
 }
-.login-btn {
+.login-logout-btn {
 	padding: 8px;
 	background: darkorange;
 	color: white;

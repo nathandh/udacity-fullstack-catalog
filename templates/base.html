@@ -8,6 +8,9 @@
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href={{ url_for('static', 
 										     filename="css/catalog.css") }} />
+	{# For extra <script> and <link> imports on templates as needed #}
+	{% block head_extras %}
+	{% endblock head_extras %}
 </head>
 
 <body>
@@ -15,8 +18,8 @@
 		<div class="app-title">
 			<h2><a href="/catalog/">Catalog App</a></h2>
 		</div>
-		<div class="login-link">
-			<a href="#" class="login-btn">Login</a>
+		<div class="login-logout-link">
+			<a href="/login/" class="login-logout-btn">Login</a>
 		</div>
 	</div>
 	<div id="messages" class="messages">

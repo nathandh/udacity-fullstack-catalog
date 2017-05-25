@@ -16,11 +16,10 @@
 				{% for category in categories %}
 					<div class="category">
 						<a href="/catalog/{{category.name}}/items/">
-							{{category.name}}
-						</a><br/><br/> 
+							{{category.name}}</a><br/> 
 						{% if is_admin == True %}
 							<div class="category-admin">
-								*Admin:<br/>
+								<br/>*Admin:<br/>
 								| <a href="/catalog/{{category.name}}/">
 									Manage {{category.name}}</a> | <br/>
 								<hr>
@@ -46,8 +45,7 @@
 				{% for item in latest_items %}
 					<div class="item">
 						<a href="/catalog/{{item.category.name}}/{{item.name}}/">
-							{{item.name}}
-						</a>
+							{{item.name}}</a>
 						<span class="item-categ">
 							({{item.category.name}})
 						</span>
