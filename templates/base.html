@@ -15,11 +15,19 @@
 
 <body>
 	<div id="top" class="top">
+		<div class="app-logo">
+			<img src="{{ url_for('static', filename="images/books.jpg") }}"
+				alt="Item Catalog App Logo">
+		</div>
 		<div class="app-title">
 			<h2><a href="/catalog/">Catalog App</a></h2>
 		</div>
 		<div class="login-logout-link">
-			<a href="/login/" class="login-logout-btn">Login</a>
+			{% if 'email' not in session %}
+				<a href="/login/" class="login-logout-btn">Login</a>
+			{% else %}
+				<a href="/logout/" class="login-logout-btn">Logout</a>
+			{% endif %}
 		</div>
 	</div>
 	<div id="messages" class="messages">
@@ -35,6 +43,24 @@
 	</div>
 	<div id="content" class="content">
 		{% block content %}
+		{% endblock %}
+	</div>
+	<div class="home-link">
+		<a href="/catalog/">Home</a><br/>
+	</div>
+	<div id="footer" class="footer">
+		{% block footer %}
+			{# Text based Links/Trails and API Endpoints #}
+			<hr>
+			<a href="/catalog/">Home</a> | 	
+			<a href="/catalog.json">Full Catalog JSON</a> | 
+			<a href="/catalog/categories/json/">All Categies JSON</a> | 
+			<a href="/catalog/items/json/">All Items JSON</a> | 
+			<a href="/catalog/login-types/json/">All LoginTypes JSON</a> | 
+			<a href="/catalog/roles/json/">All User ROLES JSON</a> | 
+			<a href="/catalog/users/json/">All USERS JSON</a>
+			{% block extra_api_links %}
+			{% endblock %}
 		{% endblock %}
 	</div>
 </body>

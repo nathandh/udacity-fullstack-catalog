@@ -11,10 +11,13 @@
 {% endblock %}
 
 {% block content %}
+	<div class="oauth-header">
+		<h1>Login with OAuth 2.0</h1>
+	</div>
 	<div id="gSigninButton">
-		<h4>Use Google:</h4>
+		<h4>Login with Google:</h4>
 		<span class="g-signin"
-			data-scope="openid email"
+			data-scope="openid email profile"
 			data-clientid="759333530786-qtbejoccaa9r1nbvtqdrv9l0e3oim4ru.apps.googleusercontent.com"
 			data-redirecturi="postmessage"
 			data-accesstype="offline"

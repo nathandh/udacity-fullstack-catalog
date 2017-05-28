@@ -9,10 +9,16 @@
 		<h3>{{curr_categ.name}}</h3>
 		Description: {{curr_categ.description}}
 	</div>
-	<a href="/catalog/{{curr_categ.name}}/edit/">
-		Edit
-	</a> | 
-	<a href="/catalog/{{curr_categ.name}}/delete/">
-		Delete
-	</a>
+	{% if is_admin == True %}
+		<a href="/catalog/{{curr_categ.name}}/edit/">
+			Edit
+		</a> | 
+		<a href="/catalog/{{curr_categ.name}}/delete/">
+			Delete
+		</a>
+	{% endif %}<br/><br/>
+{% endblock %}
+
+{% block extra_api_links %}
+	 | <a href="/catalog/{{curr_categ.name}}/json/">{{curr_categ.name}} Categ JSON</a> | <a href="/catalog/{{curr_categ.name}}/items/json/">{{curr_categ.name}} Items JSON</a>
 {% endblock %}

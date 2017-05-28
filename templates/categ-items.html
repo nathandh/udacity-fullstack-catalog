@@ -6,7 +6,7 @@
 
 {% block right_content %}
 	<div class="right-content">
-		{% if is_admin == True %}
+		{% if is_contrib == True %}
 			<a href="/catalog/item/new/">Add Item</a>
 		{% endif %}
 		<h3>{{curr_categ.name}} Items</h3>
@@ -24,5 +24,12 @@
 		{% else %}
 			<p>No Items for: {{curr_categ.name}}</p>
 		{% endif %}
+		<hr>
+		<h3>{{curr_categ.name}} (description):</h3>
+		<p>{{curr_categ.description}}</p>
 	</div>
+{% endblock %}
+
+{% block extra_api_links %}
+	 | <a href="/catalog/{{curr_categ.name}}/items/json/">{{curr_categ.name}} Items JSON</a>
 {% endblock %}
