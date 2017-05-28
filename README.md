@@ -87,3 +87,40 @@ The following 'MAIN' files are contained in this project:
 	```
 	python test_data.py
 	```
+
+## Installation:
+#### System Requirements:
+1. Python 2 (e.g. 2.7.x)
+2. Flask libraries
+3. SQLAlchemy libraries
+4. SQLite
+
+#### Obtaining the Code:
+* Clone the repository from GitHub
+```
+git clone https://github.com/nathandh/udacity-fullstack-catalog.git
+```
+
+#### Database Setup:
+1. Create the 'itemcatalog.db' SQLite database:
+```
+cd udacity-fullstack-catalog
+python database_setup.py
+```
+2. Populate the database with initial Test data
+```
+python test_data.py 
+```
+
+#### Usage:
+To run:
+1. Ensure 'clients_secrets.json' file exists in top project directory
+2. Start the app server instance:
+```
+python catalog.py
+```
+3. Visit the app via `http://localhost:9090/` or `http://127.0.0.1:9090`
+	* Port 9090 is defined in 'catalog.py' as default port to run app on
+
+#### License:
+Licensed for use under the MIT License
